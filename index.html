@@ -837,7 +837,7 @@
                     method: 'POST', 
                     mode: 'no-cors', 
                     headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({type, data}) 
+                    body: JSON.stringify(payload) 
                 }); 
             } catch(e){
                 console.error("Error sending data to Google Sheet:", e);
