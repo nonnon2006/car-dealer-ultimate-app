@@ -174,7 +174,7 @@
     <div id="sellModal" class="fixed inset-0 bg-black/80 z-50 hidden items-end sm:items-center justify-center backdrop-blur-sm">
         <div ontouchmove="handleTouchInteraction(event)" class="glass w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl h-[90vh] sm:h-auto flex flex-col border border-slate-700">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-emerald-400"><i class="fa-solid fa-hand-holding-dollar mr-2"></i>ปิดการขาย & แบ่งกำไร</h3>
+                <h3 class="text-xl font-bold text-emerald-400"><i class="fa-solid fa-hand-holding-dollar mr-2"></i>ปิดการขาย &amp; แบ่งกำไร</h3>
                 <button onclick="toggleModal('sellModal', false)" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
             
@@ -239,7 +239,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- MODAL: AI ANALYSIS ADVISOR -->
     <div id="aiAnalysisModal" class="fixed inset-0 bg-black/80 z-50 hidden items-end sm:items-center justify-center p-4 backdrop-blur-sm">
         <div ontouchmove="handleTouchInteraction(event)" class="glass w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl h-[90vh] sm:h-auto flex flex-col border border-slate-700">
@@ -268,16 +268,16 @@
     <!-- MODAL: SETTINGS (Team & Firebase Config) -->
     <div id="settingsModal" class="fixed inset-0 bg-black/90 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
         <div ontouchmove="handleTouchInteraction(event)" class="glass w-full max-w-md rounded-2xl p-6 border border-slate-700">
-            <h3 class="text-lg font-bold mb-4 text-white"><i class="fa-solid fa-users-gear"></i> ตั้งค่าทีม & การเชื่อมต่อ</h3>
+            <h3 class="text-lg font-bold mb-4 text-white"><i class="fa-solid fa-users-gear"></i> ตั้งค่าทีม &amp; การเชื่อมต่อ</h3>
             
             <!-- NEW: Firebase Configuration Section -->
             <div class="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-900/10">
                 <h4 class="text-sm font-bold text-red-400 mb-2 flex items-center gap-2"><i class="fa-solid fa-database"></i> ฐานข้อมูล Firebase Config</h4>
                 <p class="text-xs text-slate-400 mb-3">**สำคัญ:** กรอกข้อมูลนี้ **เฉพาะ** เมื่อรันบน GitHub Pages (ไม่ใช่ใน Canvas) เพื่อให้แอปเชื่อมต่อกับโปรเจกต์ Firebase ของคุณเอง</p>
                 
-                <input type="text" id="configApiKey" placeholder="AIzaSyCiFMeLSC4ThGg1k5aiVMQaQ8nkLfpW2Do" class="input-field text-xs mb-2">
-                <input type="text" id="configProjectId" placeholder="cardealerultimate-myname" class="input-field text-xs mb-2">
-                <input type="text" id="configAppId" placeholder="1:396618118520:web:e3eb4005a87a574442448d" class="input-field text-xs">
+                <input type="text" id="configApiKey" placeholder="Firebase API Key (apiKey)" class="input-field text-xs mb-2">
+                <input type="text" id="configProjectId" placeholder="Firebase Project ID (projectId)" class="input-field text-xs mb-2">
+                <input type="text" id="configAppId" placeholder="App ID (สำหรับเก็บข้อมูล: ไม่ใช่ Firebase ID)" class="input-field text-xs">
             </div>
 
             <div class="mb-6">
@@ -293,7 +293,7 @@
             
             <div class="mb-4">
                 <label class="text-xs text-slate-400 mb-1 block">Google Apps Script URL (Optional Sync)</label>
-                <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycby2k96rQs9biZ7DZm-Xr3vTYZ_Cf3VjcxLNNdPswLbg/dev" class="input-field text-xs">
+                <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/..." class="input-field text-xs">
             </div>
 
             <div class="flex justify-end gap-2">
@@ -325,15 +325,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, query, orderBy, arrayRemove, arrayUnion, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+
         // --- GLOBAL FIREBASE/APP VARS ---
         let db, auth, userId, appId, isAuthReady = false;
         let cars = [];
         let expenses = [];
-        let settings = { team: [], scriptUrl: '' }; 
+        let settings = { team: [], scriptUrl: '' };
         let currentTab = 'stock';
-        let currentConfirmationCallback = null; 
+        let currentConfirmationCallback = null;
         let activeSellCar = null;
+        window.activeAiCarDetails = null; // New global for active car in AI modal
         window.aiAnalysisResult = null;
         window.isAiLoading = false;
         let isRunningInCanvas = typeof __firebase_config !== 'undefined';
@@ -356,8 +357,8 @@
         window.openEditExpenseForm = openEditExpenseForm;
         window.handleDeleteExpense = handleDeleteExpense;
         window.openAiAnalysisModal = openAiAnalysisModal;
-        window.runAiAnalysis = runAiAnalysis; 
-
+        window.runAiAnalysis = runAiAnalysis;
+        
         // Utility functions (unchanged)
         window.formatMoney = (n) => '฿' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
         window.formatK = (n) => {
@@ -368,15 +369,16 @@
         window.handleTouchInteraction = handleTouchInteraction;
         window.showToast = showToast;
         window.confirmAction = confirmAction;
-        window.openConfirmModal = openConfirmModal; 
+        window.openConfirmModal = openConfirmModal;
         window.renderAiAnalysisModal = renderAiAnalysisModal;
 
         // --- FIREBASE CONFIGURATION LOGIC (Crucial Change for GitHub) ---
         function getFirebaseConfig() {
             // 1. Try Canvas Globals (High Priority)
             if (isRunningInCanvas) {
+                // Ensure __app_id is used for consistency, even if it's 'default-app-id'
                 const config = JSON.parse(__firebase_config);
-                return { config, app_id: __app_id, auth_token: __initial_auth_token, source: 'Canvas' };
+                return { config, app_id: __app_id, auth_token: typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null, source: 'Canvas' };
             }
             
             // 2. Try Local Storage (For GitHub Pages)
@@ -418,24 +420,33 @@
                     authStatusEl.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> ฐานข้อมูลพร้อมใช้งาน`;
                     authStatusEl.classList.remove('text-red-400');
                 } else {
-                    // Sign in anonymously if no token is available or if running on GitHub
-                    try {
-                        const anonUser = await signInAnonymously(auth);
-                        userId = anonUser.user.uid;
-                        authStatusEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> ฐานข้อมูลพร้อมใช้งาน (Anon)';
-                        authStatusEl.classList.remove('text-red-400');
-                    } catch(e) {
-                        console.error("Anonymous Sign-In Failed:", e);
-                        userId = crypto.randomUUID(); // Fallback UUID
-                        authStatusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle text-red-400 mr-1"></i> ข้อผิดพลาด Firebase: สิทธิ์/การเชื่อมต่อไม่ถูกต้อง';
+                    // Sign in anonymously if sign-in failed or no user found (should only happen if custom token fails or running locally)
+                    if (!finalConfig.auth_token) {
+                        try {
+                            const anonUser = await signInAnonymously(auth);
+                            userId = anonUser.user.uid;
+                            authStatusEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> ฐานข้อมูลพร้อมใช้งาน (Anon)';
+                            authStatusEl.classList.remove('text-red-400');
+                        } catch(e) {
+                            console.error("Anonymous Sign-In Failed:", e);
+                            // Fallback UUID if both custom token (if present) and anonymous failed
+                            userId = crypto.randomUUID(); 
+                            authStatusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle text-red-400 mr-1"></i> ข้อผิดพลาด Firebase: สิทธิ์/การเชื่อมต่อไม่ถูกต้อง';
+                            authStatusEl.classList.add('text-red-400');
+                        }
+                    } else {
+                        // This case means custom token was present but failed, and onAuthStateChanged was called with no user.
+                        userId = crypto.randomUUID();
+                        authStatusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle text-red-400 mr-1"></i> ข้อผิดพลาด Firebase: โทเค็นไม่ถูกต้อง';
                         authStatusEl.classList.add('text-red-400');
                     }
                 }
                 document.getElementById('userIdDisplay').innerText = userId;
-                isAuthReady = true;
                 
-                // 2. DATA SUBSCRIPTION STARTS AFTER AUTH IS READY
-                if (isAuthReady) {
+                // Only mark as ready once we have a definitive userId (authenticated or anonymous)
+                if (!isAuthReady) {
+                    isAuthReady = true;
+                    // 2. DATA SUBSCRIPTION STARTS AFTER AUTH IS READY
                     await fetchInitialSettings();
                     setupListeners();
                 }
@@ -448,10 +459,15 @@
             // Initial sign-in attempt with custom token if available (Canvas only)
             if (finalConfig.auth_token) {
                 signInWithCustomToken(auth, finalConfig.auth_token).catch(e => {
-                    console.error("Custom Token Sign-In Failed (Falling back to Anonymous):", e);
+                    console.error("Custom Token Sign-In Failed (onAuthStateChanged will handle fallback):", e);
+                    // onAuthStateChanged listener will catch the lack of user and proceed with anonymous sign-in logic
                 });
-            } else if (!auth.currentUser) {
-                // If running locally or no token, onAuthStateChanged will trigger anonymous sign-in
+            } else if (!auth.currentUser && !isRunningInCanvas) {
+                 // If running locally (no custom token) and no current user, trigger anonymous sign-in
+                 // This ensures the initial anonymous sign-in attempt happens promptly if running locally.
+                 signInAnonymously(auth).catch(e => {
+                    console.error("Initial Anonymous Sign-In Failed:", e);
+                });
             }
 
         } else {
@@ -473,8 +489,7 @@
         }
 
         async function fetchInitialSettings() {
-             // ... [Rest of fetchInitialSettings remains the same]
-             try {
+			try {
                 const settingsSnap = await getDoc(getSettingsDocRef());
                 if (settingsSnap.exists()) {
                     settings = settingsSnap.data();
@@ -500,11 +515,12 @@
                     authStatusEl.classList.add('text-red-400');
                     showToast('ไม่สามารถบันทึก/โหลดข้อมูลได้: ตรวจสอบสิทธิ์ Firebase', 'error');
                 }
+                // Fallback to minimal default settings
                 settings = { 
                     team: [
                         { name: 'กองทุนร้าน', share: 100 }
                     ], 
-                    scriptUrl: '' 
+                    scriptUrl: ''
                 };
             }
         }
@@ -522,7 +538,6 @@
         }
 
         function setupListeners() {
-            // ... [Rest of setupListeners remains the same]
             onSnapshot(query(getCarCollectionRef()), (snapshot) => {
                 cars = snapshot.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
                 renderMain();
@@ -556,13 +571,13 @@
 
             const f = new FormData(e.target);
             const editCarId = f.get('editCarId');
-            const newCarData = { 
-                brand: f.get('brand'), 
-                model: f.get('model'), 
-                year: Number(f.get('year')), 
-                plate: f.get('plate'), 
-                color: f.get('color'), 
-                mileage: Number(f.get('mileage')), 
+            const newCarData = {	
+                brand: f.get('brand'),	
+                model: f.get('model'),	
+                year: Number(f.get('year')),	
+                plate: f.get('plate'),	
+                color: f.get('color'),	
+                mileage: Number(f.get('mileage')),	
                 buyPrice: Number(f.get('buyPrice'))
             };
 
@@ -572,7 +587,7 @@
 
                 if (editCarId) {
                     await setDoc(docRef, newCarData, { merge: true });
-                    syncToSheet({ id: carId, ...newCarData }, 'EDIT_CAR'); 
+                    syncToSheet({ id: carId, ...newCarData }, 'EDIT_CAR');	
                     showToast('แก้ไขข้อมูลรถสำเร็จ');
                 } else {
                     const newCar = { id: carId, ...newCarData, soldDate: null };
@@ -584,7 +599,7 @@
                 console.error("Car Save Failed:", e);
                 showToast(`บันทึกรถล้มเหลว: ${e.code || 'Unknown Error'}`, 'error');
             }
-            toggleModal('addCarModal', false); 
+            toggleModal('addCarModal', false);	
             e.target.reset();
         }
 
@@ -597,10 +612,10 @@
             const carId = Number(f.get('carId'));
             
             const expData = {
-                paymentMethod: f.get('paymentMethod'), 
-                category: f.get('category'), 
-                item: f.get('item'), 
-                amount: Number(f.get('amount')), 
+                paymentMethod: f.get('paymentMethod'),	
+                category: f.get('category'),	
+                item: f.get('item'),	
+                amount: Number(f.get('amount')),	
                 payerName: f.get('payerName')
             };
 
@@ -625,7 +640,7 @@
 
             document.getElementById('editExpenseId').value = '';
             e.target.reset();
-            openExpenseModal(carId); 
+            openExpenseModal(carId);	
         }
 
         function handleDeleteExpense(expenseId, carId) {
@@ -646,7 +661,7 @@
                         console.error("Expense Delete Failed:", e);
                         showToast(`ลบรายการล้มเหลว: ${e.code || 'Unknown Error'}`, 'error');
                     }
-                    openExpenseModal(carId); 
+                    openExpenseModal(carId);	
                 }
             };
             window.openConfirmModal('คุณแน่ใจหรือไม่ที่จะลบรายการค่าใช้จ่ายนี้? การกระทำนี้ไม่สามารถย้อนกลับได้', deleteCallback, 'ลบค่าใช้จ่าย');
@@ -683,9 +698,9 @@
                             shares: finalShares,
                         }, { merge: true });
                         
-                        syncToSheet({ 
-                            ...activeCarDetails, 
-                            salePrice: salePrice, 
+                        syncToSheet({	
+                            ...activeCarDetails,	
+                            salePrice: salePrice,	
                             profit,
                             shares: finalShares
                         }, 'SOLD');
@@ -696,7 +711,7 @@
                         showToast(`ปิดการขายล้มเหลว: ${e.code || 'Unknown Error'}`, 'error');
                     }
                 }
-                toggleModal('sellModal', false); 
+                toggleModal('sellModal', false);	
             };
             
             window.openConfirmModal(`คุณต้องการปิดการขายรถ ${activeCarDetails.brand} ${activeCarDetails.model} ที่ราคา ${window.formatMoney(salePrice)} ใช่หรือไม่?`, sellCallback, 'ยืนยันปิดการขาย', 'ยืนยัน');
@@ -708,8 +723,8 @@
         async function syncToSheet(data, type) {
             if (!settings.scriptUrl) return;
             const apiUrl = settings.scriptUrl;
-            try { 
-                await fetch(apiUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type, data}) }); 
+            try {	
+                await fetch(apiUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type, data}) });	
             } catch(e) {
                 console.warn("Google Sheet Sync Failed (No-CORS Mode):", e);
             }
@@ -782,7 +797,7 @@
                 window.renderAiAnalysisModal();
             }
         }
-        
+
         // --- DATA & LOGIC (Now defined inside module scope) ---
         
         function getCarDetails(carId) {
@@ -800,7 +815,7 @@
             payerContributions[buyPayer] = (payerContributions[buyPayer] || 0) + Number(car.buyPrice);
 
             carExp.filter(e => e.paymentMethod === 'cash' || !e.paymentMethod).forEach(e => {
-                const payer = e.payerName || 'ไม่ระบุ'; 
+                const payer = e.payerName || 'ไม่ระบุ';	
                 payerContributions[payer] = (payerContributions[payer] || 0) + e.amount;
             });
 
@@ -810,14 +825,14 @@
             const totalCreditUsed = expCredit;
             const totalCost = totalCashUsed + totalCreditUsed;
 
-            return { 
-                ...car, 
-                totalCashUsed, 
-                totalCreditUsed, 
-                totalCost, 
+            return {	
+                ...car,	
+                totalCashUsed,	
+                totalCreditUsed,	
+                totalCost,	
                 expensesList: carExp,
-                payerContributions, 
-                taxDeductibleAmount 
+                payerContributions,	
+                taxDeductibleAmount	
             };
         }
 
@@ -833,7 +848,7 @@
 
             list.forEach(c => {
                 const d = getCarDetails(c.id);
-                if (!d) return; 
+                if (!d) return;	
                 let actionBtn;
                 let editButton = '';
                 let aiButton = '';
@@ -882,8 +897,8 @@
                     }
                     
                     let detailButton = `<button onclick="openExpenseModal(${c.id}, true)" class="w-full py-2.5 rounded-xl text-sm text-slate-400 border border-slate-700 hover:bg-slate-800 transition mt-4">
-                                        <i class="fa-solid fa-eye mr-1"></i> ดูประวัติค่าใช้จ่าย
-                                    </button>`;
+                                            <i class="fa-solid fa-eye mr-1"></i> ดูประวัติค่าใช้จ่าย
+                                        </button>`;
 
                     actionBtn = `
                     <div class="mt-4 bg-slate-900/50 p-3 rounded-xl border border-slate-700">
@@ -903,8 +918,8 @@
                     `;
                 }
 
-                let creditBadge = d.totalCreditUsed > 0 
-                    ? `<span class="absolute top-5 right-5 bg-purple-900/50 text-purple-300 text-[10px] px-2 py-1 rounded-full border border-purple-500/30 z-10"><i class="fa-regular fa-credit-card"></i> -${window.formatK(d.totalCreditUsed)}</span>` 
+                let creditBadge = d.totalCreditUsed > 0	
+                    ? `<span class="absolute top-5 right-5 bg-purple-900/50 text-purple-300 text-[10px] px-2 py-1 rounded-full border border-purple-500/30 z-10"><i class="fa-regular fa-credit-card"></i> -${window.formatK(d.totalCreditUsed)}</span>`	
                     : '';
 
                 container.innerHTML += `
@@ -973,7 +988,7 @@
                     ${sourcesHtml}
                 `;
             } else {
-                 contentDiv.innerHTML = `
+                contentDiv.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-full py-10">
                         <i class="fa-solid fa-exclamation-triangle text-red-400 text-3xl mb-3"></i>
                         <p class="text-slate-400">ไม่สามารถวิเคราะห์ได้ กรุณาลองใหม่อีกครั้ง</p>
@@ -981,7 +996,7 @@
                 `;
             }
         }
-        
+
         function openAiAnalysisModal(carId) {
             const d = getCarDetails(carId);
             if (!d) return;
@@ -995,11 +1010,11 @@
         
         // --- Modal/UI Functions (Adapted to use global data) ---
 
-        function openAddCarModal() { 
+        function openAddCarModal() {	
             document.getElementById('editCarId').value = '';
             document.getElementById('carModalTitle').innerHTML = '<i class="fa-solid fa-car"></i> รับรถเข้าใหม่';
             document.getElementById('addCarModal').querySelector('form').reset();
-            toggleModal('addCarModal', true); 
+            toggleModal('addCarModal', true);	
         }
 
         function openEditCarModal(carId) {
@@ -1014,9 +1029,9 @@
             form.querySelector('input[name="model"]').value = car.model;
             form.querySelector('input[name="plate"]').value = car.plate;
             form.querySelector('input[name="buyPrice"]').value = car.buyPrice;
-            form.querySelector('input[name="year"]').value = car.year; 
-            form.querySelector('input[name="color"]').value = car.color || ''; 
-            form.querySelector('input[name="mileage"]').value = car.mileage || ''; 
+            form.querySelector('input[name="year"]').value = car.year;	
+            form.querySelector('input[name="color"]').value = car.color || '';	
+            form.querySelector('input[name="mileage"]').value = car.mileage || '';	
 
             toggleModal('addCarModal', true);
         }
@@ -1045,11 +1060,11 @@
             const list = document.getElementById('expenseHistoryList');
             list.innerHTML = '';
             if (d.expensesList.length === 0) {
-                 list.innerHTML = `<p class="text-slate-600 italic text-center py-4">ยังไม่มีรายการค่าใช้จ่ายเพิ่มเติม</p>`;
+	            list.innerHTML = `<p class="text-slate-600 italic text-center py-4">ยังไม่มีรายการค่าใช้จ่ายเพิ่มเติม</p>`;
             } else {
                 d.expensesList.forEach(ex => {
                     const isCredit = ex.paymentMethod === 'credit';
-                    const payer = ex.payerName || 'ไม่ระบุ'; 
+                    const payer = ex.payerName || 'ไม่ระบุ';	
                     
                     let actions = '';
                     if (!isSold) {
@@ -1096,7 +1111,7 @@
             form.querySelector('input[name="amount"]').value = expense.amount;
             
             form.scrollIntoView({ behavior: 'smooth' });
-            window.showToast('กำลังแก้ไขรายการ...'); 
+            window.showToast('กำลังแก้ไขรายการ...');	
         }
 
         function openSellModal(carId) {
@@ -1116,7 +1131,7 @@
             const payerListEl = document.getElementById('payerContributionList');
             payerListEl.innerHTML = '';
             
-            const taxTotal = activeSellCar.taxDeductibleAmount; 
+            const taxTotal = activeSellCar.taxDeductibleAmount;	
             
             for (const payer in activeSellCar.payerContributions) {
                 const amount = activeSellCar.payerContributions[payer];
@@ -1134,7 +1149,7 @@
             const targets = [
                 { percent: 8, label: '8% (ขั้นต่ำ)' },
                 { percent: 10, label: '10% (ดี)' },
-                { percent: 15, label: '15% (Optimal)' } 
+                { percent: 15, label: '15% (Optimal)' }	
             ];
 
             const pricingTableEl = document.getElementById('pricingRecommendationTable');
@@ -1182,10 +1197,10 @@
         }
 
         // --- SETTINGS (Team & Config) ---
-        function openSettings() { 
+        function openSettings() {	
             const settings = window.settings;
-            document.getElementById('scriptUrl').value = settings.scriptUrl || ''; 
-            
+            document.getElementById('scriptUrl').value = settings.scriptUrl || '';	
+
             // Load Firebase Config from localStorage for editing on GitHub
             const localConfigJson = localStorage.getItem('local_firebase_config');
             const localAppId = localStorage.getItem('local_app_id');
@@ -1197,11 +1212,11 @@
                 } catch(e) {}
             }
             document.getElementById('configAppId').value = localAppId || appId;
-            
+
             updateTeamInputs();
-            window.toggleModal('settingsModal', true); 
+            window.toggleModal('settingsModal', true);	
         }
-        
+
         async function saveSettings() {
             const settings = window.settings;
             settings.scriptUrl = document.getElementById('scriptUrl').value;
@@ -1213,22 +1228,22 @@
             const inputAppId = document.getElementById('configAppId').value.trim();
             
             if (apiKey && projectId && inputAppId) {
-                 const localConfig = { apiKey, projectId, authDomain: `${projectId}.firebaseapp.com` };
-                 localStorage.setItem('local_firebase_config', JSON.stringify(localConfig));
-                 localStorage.setItem('local_app_id', inputAppId);
-                 window.showToast('บันทึกการตั้งค่า Firebase แล้ว (รีโหลดเพื่อใช้งาน)', 'success');
+	            const localConfig = { apiKey, projectId, authDomain: `${projectId}.firebaseapp.com` };
+	            localStorage.setItem('local_firebase_config', JSON.stringify(localConfig));
+	            localStorage.setItem('local_app_id', inputAppId);
+	            window.showToast('บันทึกการตั้งค่า Firebase แล้ว (รีโหลดเพื่อใช้งาน)', 'success');
             } else if (!isRunningInCanvas) {
-                 // Clear local config if fields are empty and not running in Canvas
-                 localStorage.removeItem('local_firebase_config');
-                 localStorage.removeItem('local_app_id');
+	            // Clear local config if fields are empty and not running in Canvas
+	            localStorage.removeItem('local_firebase_config');
+	            localStorage.removeItem('local_app_id');
             }
 
             if (await window.saveSettingsToFirestore()) {
-                 window.toggleModal('settingsModal', false); 
-                 window.showToast('บันทึกการตั้งค่าทีมสำเร็จ');
+	            window.toggleModal('settingsModal', false);	
+	            window.showToast('บันทึกการตั้งค่าทีมสำเร็จ');
             }
         }
-        
+
         function updateTeamInputs() {
             const div = document.getElementById('teamInputs');
             div.innerHTML = '';
@@ -1244,25 +1259,25 @@
                 `;
             });
         }
-        
-        function updateTeamMember(i, f, v) { 
+
+        function updateTeamMember(i, f, v) {	
             const settings = window.settings;
-            settings.team[i][f] = f==='share'?Number(v):v; 
+            settings.team[i][f] = f==='share'?Number(v):v;	
             window.settings = settings;
         }
-        
-        function addTeamMember() { 
+
+        function addTeamMember() {	
             const settings = window.settings;
-            settings.team.push({name: 'หุ้นส่วนใหม่', share: 0}); 
+            settings.team.push({name: 'หุ้นส่วนใหม่', share: 0});	
             window.settings = settings;
-            updateTeamInputs(); 
+            updateTeamInputs();	
         }
-        
-        function removeTeamMember(i) { 
+
+        function removeTeamMember(i) {	
             const settings = window.settings;
-            settings.team.splice(i, 1); 
+            settings.team.splice(i, 1);	
             window.settings = settings;
-            updateTeamInputs(); 
+            updateTeamInputs();	
         }
 
         // --- Confirmation Modal ---
@@ -1301,7 +1316,7 @@
         }
 
         function showToast(message = 'บันทึกสำเร็จ', type = 'success') {
-            const t = document.getElementById('toast'); 
+            const t = document.getElementById('toast');	
             const icon = t.querySelector('i');
             const span = t.querySelector('span');
             
@@ -1322,6 +1337,22 @@
             setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 2000);
         }
         
+        // --- Tab Change ---
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-stock').classList.remove('text-blue-500', 'border-blue-500');
+            document.getElementById('tab-stock').classList.add('text-slate-500', 'border-transparent', 'hover:text-slate-300');
+            document.getElementById('tab-sold').classList.remove('text-blue-500', 'border-blue-500');
+            document.getElementById('tab-sold').classList.add('text-slate-500', 'border-transparent', 'hover:text-slate-300');
+
+            document.getElementById(`tab-${tab}`).classList.remove('text-slate-500', 'border-transparent', 'hover:text-slate-300');
+            document.getElementById(`tab-${tab}`).classList.add('text-blue-500', 'border-blue-500');
+            
+            renderMain();
+        }
+
+        // Set initial tab state
+        setTab(currentTab); 
     </script>
 </body>
 </html>
