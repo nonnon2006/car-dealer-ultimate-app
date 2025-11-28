@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกประวัติเครื่องลิฟต์/เครื่องจักร</title>
+    
+    <!-- Google Fonts: Sarabun for Thai formal look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6; /* Light gray background for screen */
+            padding: 20px;
+        }
+
+        /* A4 Paper Simulation */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            box-sizing: border-box; 
+        }
+
+        /* Input lines styling (Dotted bottom border) */
+        .input-line {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+            min-width: 50px;
+            padding: 0 5px;
+            outline: none;
+            color: #000; /* Blue for typed text visibility, set to black for print if preferred */
+        }
+        
+        .input-line:empty::before {
+            content: "\00a0"; /* Non-breaking space to keep height */
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: center;
+            background-color: #f9fafb; /* Light gray header */
+            font-weight: 600;
+            height: 40px;
+        }
+
+        td {
+            height: 35px; /* Fixed height for rows */
+        }
+
+        /* Checkbox styling mimic */
+        .checkbox-mimic {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #000;
+            margin-right: 5px;
+            vertical-align: text-bottom;
+            cursor: pointer;
+            text-align: center;
+            line-height: 14px;
+        }
+
+        .checkbox-mimic.checked::after {
+            content: "✓";
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Print Specifics */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .page {
+                width: 100%;
+                margin: 0;
+                box-shadow: none;
+                padding: 10mm; /* Adjust padding for printer margins */
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Ensure background colors don't print unless enabled, but keep borders sharp */
+            th {
+                background-color: transparent !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Control Panel -->
+    <div class="max-w-[210mm] mx-auto mb-4 flex justify-end gap-2 no-print">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            พิมพ์แบบฟอร์ม
+        </button>
+    </div>
+
+    <!-- A4 Page -->
+    <div class="page text-black text-sm leading-relaxed">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-bold">บันทึกประวัติเครื่องลิฟต์</h1> 
+            <!-- Note: Or เครื่องจักร/เครื่องพิมพ์ depending on context, used 'Lift' based on usual I/R forms -->
+        </div>
+
+        <!-- Top Information Fields -->
+        <div class="grid grid-cols-1 gap-2 mb-2">
+            <!-- Row 1 -->
+            <div class="flex flex-wrap items-baseline gap-2">
+                <span>ยี่ห้อ</span>
+                <div class="input-line flex-grow text-center" contenteditable="true"></div>
+                <span>รุ่น</span>
+                <div class="input-line w-32 text-center" contenteditable="true"></div>
+                <span>เบอร์เครื่อง</span>
+                <div class="input-line w-32 text-center" contenteditable="true"></div>
+                <span>S/N</span>
+                <div class="input-line w-32 text-center" contenteditable="true"></div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="flex flex-wrap items-baseline gap-2">
+                <span>หมายเลขสินทรัพย์</span>
+                <div class="input-line w-40 text-center" contenteditable="true"></div>
+                <span>สถานที่ติดตั้ง</span>
+                <div class="input-line flex-grow text-center" contenteditable="true"></div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="flex flex-wrap items-baseline gap-2">
+                <span>เริ่มใช้งานเมื่อ</span>
+                <div class="input-line w-40 text-center" contenteditable="true"></div>
+                <span>หน่วยงานผู้ใช้</span>
+                <div class="input-line flex-grow text-center" contenteditable="true"></div>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">วันที่บริการ</th>
+                    <th style="width: 25%;">ช่างบริการ/หน่วยงาน</th>
+                    <th style="width: 30%;">รายการบริการ</th>
+                    <th style="width: 25%;">ตรวจสอบ/หน่วยงาน</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Javascript will populate rows here to ensure consistency -->
+            </tbody>
+        </table>
+
+        <!-- Footer / Legend -->
+        <div class="mt-4 text-xs">
+            <div class="flex items-start gap-2 mb-1">
+                <div class="checkbox-mimic checked"></div> 
+                <span>I - ตรวจสอบ, ทำความสะอาดปรับตั้ง, ขันแน่น, หล่อลื่น หรือเปลี่ยนถ้าจำเป็น</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <div class="checkbox-mimic checked"></div> 
+                <span>R - ซ่อม, เปลี่ยน (รายการชิ้นส่วน)</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to create table rows
+        function generateRows(count) {
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+            
+            for (let i = 0; i < count; i++) {
+                html += `
+                <tr>
+                    <td class="text-center relative">
+                        <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+                             <div contenteditable="true" class="w-[90%] border-b border-dotted border-gray-400 outline-none"></div>
+                        </div>
+                    </td>
+                    <td class="text-center relative">
+                         <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+                             <div contenteditable="true" class="w-[90%] border-b border-dotted border-gray-400 outline-none"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex justify-center items-center gap-4 h-full">
+                            <div class="flex items-center gap-1">
+                                <div class="checkbox-mimic" onclick="toggleCheck(this)"></div> 
+                                <span>I</span>
+                                <div contenteditable="true" class="border-b border-dotted border-black w-8 outline-none ml-1"></div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="checkbox-mimic" onclick="toggleCheck(this)"></div> 
+                                <span>R</span>
+                                <div contenteditable="true" class="border-b border-dotted border-black w-8 outline-none ml-1"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center relative">
+                        <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+                             <div contenteditable="true" class="w-[90%] border-b border-dotted border-gray-400 outline-none"></div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+
+        // Toggle checkbox visual
+        window.toggleCheck = function(element) {
+            // Direct toggle on the clicked element
+            element.classList.toggle('checked');
+        }
+
+        // Generate 18 rows to fit A4 approximately
+        generateRows(18);
+    </script>
+</body>
+</html>
